@@ -50,7 +50,10 @@
             color: #555;
             line-height: 1.6;
         }
-        a.button {
+        .map-button {
+            margin: 20px 0;
+        }
+        .map-button a {
             display: inline-block;
             background: #3498db;
             color: white;
@@ -59,17 +62,8 @@
             text-decoration: none;
             transition: 0.3s;
         }
-        a.button:hover {
+        .map-button a:hover {
             background: #2980b9;
-        }
-        .map-container {
-            margin: 20px 0;
-        }
-        .map-container iframe {
-            width: 100%;
-            height: 500px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .pdf-container {
             margin-top: 20px;
@@ -78,12 +72,22 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 100%;
             height: 100vh;
+            position: relative;
         }
         canvas {
             width: 100% !important;
             height: auto !important;
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
+        }
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            color: #3498db;
+            display: none;
         }
         .pdf-controls {
             margin-top: 10px;
@@ -99,23 +103,18 @@
 <body>
     <div class="navbar">
         <a href="#">Home</a>
-        <a href="#">About</a>
-        <a href="#">Contact</a>
     </div>
     <div class="container">
         <h1>North California Tour Guide for NYUAD Students</h1>
         <p>A travel guide for NYUAD students studying away in NYU Los Angeles, covering Northern California’s attractions, art, dining, and media-focused opportunities.</p>
-        
-        <!-- MapHub Link Button -->
-        <a class="button" href="https://maphub.net/danyaali/norcal-tour" target="_blank">View the Map</a>
-        
-        <div class="map-container">
-            <iframe src="https://maphub.net/danyaali/norcal-tour" title="NorCal Tour Map"></iframe>
+        <div class="map-button">
+            <a href="https://maphub.net/danyaali/norcal-tour" target="_blank">View the Map</a>
         </div>
         <p>The map highlights all the locations featured in the tour guide activities.</p>
-        
+
         <!-- PDF.js Viewer -->
         <div class="pdf-container">
+            <div class="loading" id="loading">Loading PDF...</div>
             <canvas id="pdf-render"></canvas>
         </div>
         <div class="pdf-controls">
@@ -128,9 +127,9 @@
     <div class="footer">
         <p>&copy; 2025 North California Tour Guide | Designed for NYUAD Students</p>
     </div>
-    
+
     <script>
-        const url = 'NorCal.pdf';
+        const url = 'https://raw.githubusercontent.com/your-repo/TourNorCal.pdf';
         let pdfDoc = null,
             pageNum = 1,
             pageIsRendering = false,
@@ -138,23 +137,29 @@
 
         const scale = 1.5,
               canvas = document.getElementById('pdf-render'),
-              ctx = canvas.getContext('2d');
+              ctx = canvas.getContext('2d'),
+              loading = document.getElementById('loading');
 
         function renderPage(num) {
             pageIsRendering = true;
+            loading.style.display = 'block';
             pdfDoc.getPage(num).then(page => {
                 const viewport = page.getViewport({ scale });
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
+
                 const renderCtx = {
                     canvasContext: ctx,
                     viewport: viewport
                 };
+
                 const renderTask = page.render(renderCtx);
                 canvas.style.opacity = 0;
                 renderTask.promise.then(() => {
                     pageIsRendering = false;
                     canvas.style.opacity = 1;
+                    loading.style.display = 'none';
+
                     if (pageNumPending !== null) {
                         renderPage(pageNumPending);
                         pageNumPending = null;
@@ -163,7 +168,7 @@
             });
             document.getElementById('page-num').textContent = num;
         }
-        
+
         function queueRenderPage(num) {
             if (pageIsRendering) {
                 pageNumPending = num;
@@ -171,7 +176,7 @@
                 renderPage(num);
             }
         }
-        
+
         function prevPage() {
             if (pageNum <= 1) {
                 return;
@@ -179,7 +184,7 @@
             pageNum--;
             queueRenderPage(pageNum);
         }
-        
+
         function nextPage() {
             if (pageNum >= pdfDoc.numPages) {
                 return;
@@ -187,7 +192,7 @@
             pageNum++;
             queueRenderPage(pageNum);
         }
-        
+
         pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
             pdfDoc = pdfDoc_;
             document.getElementById('page-count').textContent = pdfDoc.numPages;
