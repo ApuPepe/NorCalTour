@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>North California Tour Guide for NYUAD Students</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,12 +12,7 @@
             padding: 0;
             background-color: #f4f4f9;
             color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             text-align: center;
-            overflow: hidden;
         }
         h1 {
             margin: 20px 0;
@@ -24,7 +20,6 @@
             color: #2c3e50;
         }
         p {
-            margin: 10px 0 30px;
             font-size: 1.2rem;
             color: #7f8c8d;
         }
@@ -42,33 +37,107 @@
             color: #fff;
         }
         #pdf-container {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
         }
-        #pdf-render {
-            width: 100%;
-            height: 100%;
-            display: block;
-            object-fit: contain;
+        canvas {
+            border: 1px solid #ccc;
+        }
+        .controls {
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:disabled {
+            background-color: #ccc;
         }
     </style>
 </head>
 <body>
     <h1>North California Tour Guide for NYUAD Students</h1>
-    <p>A travel guide for NYUAD students studying away in NYU Los Angeles, <br> covering Northern California’s attractions, art, dining, and media-focused opportunities.</p>
+    <p>A travel guide for NYUAD students studying away in NYU Los Angeles, covering Northern California’s attractions, art, dining, and media-focused opportunities.</p>
     <a href="https://maphub.net/danyaali/norcal-tour?" target="_blank">View the Map</a>
     <p>The map highlights all the locations featured in the tour guide activities.</p>
-
+    
     <!-- PDF Viewer Container -->
     <div id="pdf-container">
-        <embed id="pdf-render" src="NorCalTour.pdf" type="application/pdf">
+        <canvas id="pdf-canvas"></canvas>
+        <div class="controls">
+            <button id="prev-page">Previous Page</button>
+            <span>Page: <span id="page-num"></span> / <span id="page-count"></span></span>
+            <button id="next-page">Next Page</button>
+        </div>
     </div>
-
+    
     <script>
-        // Optional: If you want a custom page navigation (next/previous page), you'd implement a PDF.js-based solution here.
-        // You can load pages dynamically with PDF.js if required.
+        let url = 'NorCalTour.pdf';
+        let pdfDoc = null,
+            pageNum = 1,
+            pageIsRendering = false,
+            pageNumPending = null;
+        
+        const scale = 1.5,
+              canvas = document.getElementById('pdf-canvas'),
+              ctx = canvas.getContext('2d');
+        
+        function renderPage(num) {
+            pageIsRendering = true;
+            pdfDoc.getPage(num).then(page => {
+                const viewport = page.getViewport({ scale });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                return page.render(renderContext).promise;
+            }).then(() => {
+                pageIsRendering = false;
+                if (pageNumPending !== null) {
+                    renderPage(pageNumPending);
+                    pageNumPending = null;
+                }
+            });
+            document.getElementById('page-num').textContent = num;
+        }
+        
+        function queueRenderPage(num) {
+            if (pageIsRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+        
+        function showPrevPage() {
+            if (pageNum <= 1) return;
+            pageNum--;
+            queueRenderPage(pageNum);
+        }
+        
+        function showNextPage() {
+            if (pageNum >= pdfDoc.numPages) return;
+            pageNum++;
+            queueRenderPage(pageNum);
+        }
+        
+        pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
+            pdfDoc = pdfDoc_;
+            document.getElementById('page-count').textContent = pdfDoc.numPages;
+            renderPage(pageNum);
+        });
+        
+        document.getElementById('prev-page').addEventListener('click', showPrevPage);
+        document.getElementById('next-page').addEventListener('click', showNextPage);
     </script>
 </body>
 </html>
