@@ -4,56 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>North California Tour Guide for NYUAD Students</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
+            background: linear-gradient(to right, #eef2f3, #8e9eab);
             color: #333;
             text-align: center;
         }
+        .navbar {
+            background: #2c3e50;
+            padding: 15px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            text-align: center;
+        }
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 15px;
+            font-size: 1.2rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: 80px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
         h1 {
-            margin: 20px 0;
             font-size: 2.5rem;
             color: #2c3e50;
         }
         p {
             font-size: 1.2rem;
-            color: #7f8c8d;
+            color: #555;
+            line-height: 1.6;
         }
-        a {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: bold;
-            padding: 10px 20px;
-            border: 2px solid #3498db;
+        a.button {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 12px 20px;
             border-radius: 5px;
-            transition: all 0.3s;
+            transition: 0.3s;
         }
-        a:hover {
-            background-color: #3498db;
-            color: #fff;
+        a.button:hover {
+            background: #2980b9;
+        }
+        .pdf-container {
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         iframe {
-            margin: 30px 0;
+            width: 100%;
+            height: 750px;
             border: none;
+            border-radius: 10px;
+        }
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            margin-top: 40px;
         }
     </style>
 </head>
 <body>
-    <h1>North California Tour Guide for NYUAD Students</h1>
-    <p>A travel guide for NYUAD students studying away in NYU Los Angeles, covering Northern California’s attractions, art, dining, and media-focused opportunities.</p>
-    <a href="https://maphub.net/danyaali/norcal-tour" target="_blank">View the Map</a>
-    <p>The map highlights all the locations featured in the tour guide activities.</p>
+    <div class="navbar">
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+    </div>
+    <div class="container">
+        <h1>North California Tour Guide for NYUAD Students</h1>
+        <p>A travel guide for NYUAD students studying away in NYU Los Angeles, covering Northern California’s attractions, art, dining, and media-focused opportunities.</p>
+        <a class="button" href="https://maphub.net/danyaali/norcal-tour" target="_blank">View the Map</a>
+        <p>The map highlights all the locations featured in the tour guide activities.</p>
+        
+        <!-- Embedded PDF Viewer with Fallback -->
+        <div class="pdf-container">
+            <iframe
+                src="NorCal.pdf"
+                title="NorCal Guide PDF">
+            </iframe>
+        </div>
+    </div>
     
-    <!-- Embedded PDF Viewer with Fallback -->
-    <iframe
-        src="NorCal.pdf"
-        width="100%"
-        height="750"
-        title="NorCal Guide PDF">
-        This browser does not support PDFs. Please <a href="NorCal.pdf">download the PDF</a> to view it.
-    </iframe>
+    <div class="footer">
+        <p>&copy; 2025 North California Tour Guide | Designed for NYUAD Students</p>
+    </div>
 </body>
 </html>
