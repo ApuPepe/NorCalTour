@@ -11,10 +11,6 @@
             padding: 0;
             background-color: #f4f4f9;
             color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             text-align: center;
         }
         h1 {
@@ -23,7 +19,6 @@
             color: #2c3e50;
         }
         p {
-            margin: 10px 0 30px;
             font-size: 1.2rem;
             color: #7f8c8d;
         }
@@ -48,15 +43,17 @@
 </head>
 <body>
     <h1>North California Tour Guide for NYUAD Students</h1>
-    <p>A travel guide for NYUAD students studying away in NYU Los Angeles, <br> covering Northern California’s attractions, art, dining, and media-focused opportunities.</p>
-    <a href="https://maphub.net/danyaali/norcal-tour?" target="_blank">View the Map</a>
+    <p>A travel guide for NYUAD students studying away in NYU Los Angeles, covering Northern California’s attractions, art, dining, and media-focused opportunities.</p>
+    <a href="https://maphub.net/danyaali/norcal-tour" target="_blank">View the Map</a>
     <p>The map highlights all the locations featured in the tour guide activities.</p>
-    <!-- Embedded PDF Viewer -->
+    
+    <!-- Embedded PDF Viewer with Fallback -->
     <iframe
         src="NorCal.pdf"
-        width="100"
+        width="100%"
         height="750"
         title="NorCal Guide PDF">
+        This browser does not support PDFs. Please <a href="NorCal.pdf">download the PDF</a> to view it.
     </iframe>
 </body>
 </html>
