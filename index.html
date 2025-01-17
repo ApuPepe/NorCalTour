@@ -16,6 +16,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
+            overflow: hidden;
         }
         h1 {
             margin: 20px 0;
@@ -40,9 +41,17 @@
             background-color: #3498db;
             color: #fff;
         }
-        iframe {
-            margin: 30px 0;
-            border: none;
+        #pdf-container {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        #pdf-render {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
         }
     </style>
 </head>
@@ -51,12 +60,15 @@
     <p>A travel guide for NYUAD students studying away in NYU Los Angeles, <br> covering Northern California’s attractions, art, dining, and media-focused opportunities.</p>
     <a href="https://maphub.net/danyaali/norcal-tour?" target="_blank">View the Map</a>
     <p>The map highlights all the locations featured in the tour guide activities.</p>
-    <!-- Embedded PDF Viewer -->
-    <iframe
-        src="NorCalTour.pdf"
-        width="100%"
-        height="750"
-        title="NorCal Guide PDF">
-    </iframe>
+
+    <!-- PDF Viewer Container -->
+    <div id="pdf-container">
+        <embed id="pdf-render" src="NorCalGuide.pdf" type="application/pdf">
+    </div>
+
+    <script>
+        // Optional: If you want a custom page navigation (next/previous page), you'd implement a PDF.js-based solution here.
+        // You can load pages dynamically with PDF.js if required.
+    </script>
 </body>
 </html>
