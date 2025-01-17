@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>North California Tour Guide for NYUAD Students</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -32,7 +33,7 @@
             font-size: 1.2rem;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 80px auto;
             background: #fff;
             padding: 20px;
@@ -64,12 +65,15 @@
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        iframe {
             width: 100%;
-            height: 750px;
-            border: none;
-            border-radius: 10px;
+            height: 100vh;
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+        .pdf-controls {
+            margin-top: 10px;
         }
         .footer {
             background: #2c3e50;
@@ -91,17 +95,85 @@
         <a class="button" href="https://maphub.net/danyaali/norcal-tour" target="_blank">View the Map</a>
         <p>The map highlights all the locations featured in the tour guide activities.</p>
         
-        <!-- Embedded PDF Viewer with Fallback -->
+        <!-- PDF.js Viewer -->
         <div class="pdf-container">
-            <iframe
-                src="NorCal.pdf"
-                title="NorCal Guide PDF">
-            </iframe>
+            <canvas id="pdf-render"></canvas>
+        </div>
+        <div class="pdf-controls">
+            <button onclick="prevPage()">Previous</button>
+            <span>Page: <span id="page-num"></span> / <span id="page-count"></span></span>
+            <button onclick="nextPage()">Next</button>
         </div>
     </div>
     
     <div class="footer">
         <p>&copy; 2025 North California Tour Guide | Designed for NYUAD Students</p>
     </div>
+    
+    <script>
+        const url = 'NorCal.pdf';
+        let pdfDoc = null,
+            pageNum = 1,
+            pageIsRendering = false,
+            pageNumPending = null;
+
+        const scale = 1.5,
+              canvas = document.getElementById('pdf-render'),
+              ctx = canvas.getContext('2d');
+
+        function renderPage(num) {
+            pageIsRendering = true;
+            pdfDoc.getPage(num).then(page => {
+                const viewport = page.getViewport({ scale });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                const renderCtx = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+
+                const renderTask = page.render(renderCtx);
+                renderTask.promise.then(() => {
+                    pageIsRendering = false;
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+            });
+            document.getElementById('page-num').textContent = num;
+        }
+
+        function queueRenderPage(num) {
+            if (pageIsRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+
+        function prevPage() {
+            if (pageNum <= 1) {
+                return;
+            }
+            pageNum--;
+            queueRenderPage(pageNum);
+        }
+
+        function nextPage() {
+            if (pageNum >= pdfDoc.numPages) {
+                return;
+            }
+            pageNum++;
+            queueRenderPage(pageNum);
+        }
+
+        pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
+            pdfDoc = pdfDoc_;
+            document.getElementById('page-count').textContent = pdfDoc.numPages;
+            renderPage(pageNum);
+        });
+    </script>
 </body>
 </html>
